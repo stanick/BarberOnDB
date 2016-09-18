@@ -1,6 +1,9 @@
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/reloader'
+require 'sqlite3'
+
+db = SQLite3::Database.new 'BarberShop.sqlite'
 
 get '/' do
 	erb "Hello! <a href=\"https://github.com/bootstrap-ruby/sinatra-bootstrap\">Original</a> pattern has been modified for <a href=\"http://rubyschool.us/\">Ruby School</a>"			
@@ -38,7 +41,12 @@ post '/visit' do
 		return erb :visit
 	end
 
-	erb "OK, username is #{@username}, #{@phone}, #{@datetime}, #{@barber}, #{@color}"
+	db.execute "insert into users (name, phone, datestamp, barber) 
+					values ('#{@username}', '#{@phone}', '#{@datetime}', '#{@barber}')"
+
+	db.close
+	erb "OK, username is #{@username}, #{@phone}, #{@datetime}, #{@barber}"
+
 
 end
 
@@ -57,6 +65,8 @@ post '/contacts' do
 		return erb :contacts
 	end
 
+	db.execute "insert into contacts (email, message) values ('#{@email}', '#{@message}')"
+	db.close
 	erb "OK, email is #{@email}, message #{@message}"
 
 end
